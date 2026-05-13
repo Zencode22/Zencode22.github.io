@@ -75,6 +75,7 @@
             justify-content: center;
             overflow: hidden;
             border-bottom: 1px solid #444;
+            position: relative; /* Needed for proper layering if we add overlays later */
         }
 
         .image-container img {
@@ -82,22 +83,6 @@
             height: 100%;
             object-fit: cover;
             display: block;
-        }
-
-        /* Fallback text if image fails to load */
-        .image-container img[alt*="Placeholder"] {
-            display: none;
-        }
-        .image-container::after {
-            content: "Image Placeholder";
-            color: var(--text-muted);
-            font-weight: bold;
-            position: absolute;
-            z-index: 0;
-        }
-        /* Hide fallback text when image loads successfully */
-        .image-container img:not([alt*="Placeholder"]) + .image-container::after {
-            display: none;
         }
 
         .card-content {
@@ -152,7 +137,6 @@
             <!-- Project 1: Wordle -->
             <article class="project-card">
                 <div class="image-container">
-                    <!-- Updated filename: Wordle.png -->
                     <img src="./images/Wordle.png" alt="Wordle Screenshot">
                 </div>
                 <div class="card-content">
@@ -165,7 +149,6 @@
             <!-- Project 2: CreatureCraftWorld -->
             <article class="project-card">
                 <div class="image-container">
-                    <!-- Updated filename: CreatureCraftWorld.png -->
                     <img src="./images/CreatureCraftWorld.png" alt="Creature Craft World Screenshot">
                 </div>
                 <div class="card-content">
@@ -178,7 +161,6 @@
             <!-- Project 3: MonsterMaze -->
             <article class="project-card">
                 <div class="image-container">
-                    <!-- Updated filename: MonsterMaze.png -->
                     <img src="./images/MonsterMaze.png" alt="Monster Maze Screenshot">
                 </div>
                 <div class="card-content">
@@ -191,7 +173,6 @@
             <!-- Project 4: FediAgri -->
             <article class="project-card">
                 <div class="image-container">
-                    <!-- Updated filename: FediAgri.png -->
                     <img src="./images/FediAgri.png" alt="FediAgri Screenshot">
                 </div>
                 <div class="card-content">
