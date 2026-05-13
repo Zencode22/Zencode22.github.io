@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connor Lonergan | Portfolio</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #4caf50; /* Green accent */
+            --accent-hover: #45a049;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 4rem 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; }
+        .subtitle { color: var(--text-muted); font-size: 1.2rem; margin-top: 0.5rem; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #333;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-color: var(--accent);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 200px;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom: 1px solid #444;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Fallback text if image fails to load */
+        .image-container img[alt*="Placeholder"] {
+            display: none;
+        }
+        .image-container::after {
+            content: "Image Placeholder";
+            color: var(--text-muted);
+            font-weight: bold;
+            position: absolute;
+            z-index: 0;
+        }
+        /* Hide fallback text when image loads successfully */
+        .image-container img:not([alt*="Placeholder"]) + .image-container::after {
+            display: none;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-content h3 { margin-top: 0; color: var(--accent); }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn:hover { background-color: var(--accent-hover); }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid #333;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Connor Lonergan</h1>
+        <div class="subtitle">Computer Programming Senior | Open Source Developer | IT Professional</div>
+    </header>
+
+    <div class="container">
+        <section class="intro">
+            <p>
+                Senior at Columbia College Chicago (BA in Computer Programming, Expected Fall 2026). 
+                Passionate about open source, decentralized systems, and building tools for the community.
+            </p>
+        </section>
+
+        <h2 style="border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">Featured Releases</h2>
+        
+        <div class="projects-grid">
+            
+            <!-- Project 1: Wordle -->
+            <article class="project-card">
+                <div class="image-container">
+                    <!-- Updated filename: Wordle.png -->
+                    <img src="./images/Wordle.png" alt="Wordle Screenshot">
+                </div>
+                <div class="card-content">
+                    <h3>Wordle</h3>
+                    <p>A classic word-guessing game implementation.</p>
+                    <a href="https://github.com/Zencode22/Wordle/releases/tag/final" class="btn" target="_blank">Download Release</a>
+                </div>
+            </article>
+
+            <!-- Project 2: CreatureCraftWorld -->
+            <article class="project-card">
+                <div class="image-container">
+                    <!-- Updated filename: CreatureCraftWorld.png -->
+                    <img src="./images/CreatureCraftWorld.png" alt="Creature Craft World Screenshot">
+                </div>
+                <div class="card-content">
+                    <h3>Crafting Creature World</h3>
+                    <p>An open-world crafting and creature simulation experience.</p>
+                    <a href="https://github.com/Zencode22/CraftingCreatureWorld/releases/tag/final" class="btn" target="_blank">Download Release</a>
+                </div>
+            </article>
+
+            <!-- Project 3: MonsterMaze -->
+            <article class="project-card">
+                <div class="image-container">
+                    <!-- Updated filename: MonsterMaze.png -->
+                    <img src="./images/MonsterMaze.png" alt="Monster Maze Screenshot">
+                </div>
+                <div class="card-content">
+                    <h3>Monster Maze</h3>
+                    <p>Navigate through procedurally generated mazes filled with monsters.</p>
+                    <a href="https://github.com/Zencode22/MonsterMaze/releases/tag/Final" class="btn" target="_blank">Download Release</a>
+                </div>
+            </article>
+
+            <!-- Project 4: FediAgri -->
+            <article class="project-card">
+                <div class="image-container">
+                    <!-- Updated filename: FediAgri.png -->
+                    <img src="./images/FediAgri.png" alt="FediAgri Screenshot">
+                </div>
+                <div class="card-content">
+                    <h3>FediAgri</h3>
+                    <p>Federated agriculture platform connecting sustainable farming communities.</p>
+                    <a href="https://github.com/Zencode22/FediAgi/releases/tag/FinalBuild" class="btn" target="_blank">Download Release</a>
+                </div>
+            </article>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Connor Lonergan. Built with open source tools.</p>
+        <p><a href="https://github.com/Zencode22" style="color: var(--accent);">View GitHub Profile</a></p>
+    </footer>
+
+</body>
+</html>
