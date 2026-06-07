@@ -12,12 +12,18 @@
         }
 
         :root {
-            --bg-color: #1a1a1a;
-            --card-bg: #2d2d2d;
-            --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --accent: #4caf50;
-            --accent-hover: #45a049;
+            /* Palestine & Green Syndicalism Theme: Red, Green, Black */
+            --bg-color: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-main: #f5f5f5;
+            --text-muted: #b8b8b8;
+            --palestine-red: #c41e3a;
+            --palestine-green: #007a3d;
+            --syndicalist-green: #2ecc71;
+            --accent: #007a3d;
+            --accent-hover: #00964a;
+            --red-accent: #c41e3a;
+            --red-hover: #e0284a;
             --border-subtle: #333;
             --card-radius: 1rem;
             --transition-default: 0.2s ease;
@@ -37,19 +43,30 @@
         header {
             text-align: center;
             padding: 4rem 1.5rem 3rem;
-            border-bottom: 1px solid var(--border-subtle);
-            background: linear-gradient(145deg, #1e1e1e 0%, #151515 100%);
+            border-bottom: 3px solid var(--palestine-red);
+            background: linear-gradient(145deg, #0f0f0f 0%, #0a0a0a 100%);
+            position: relative;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--palestine-red), var(--palestine-green), #000);
         }
 
         h1 {
             margin: 0;
             font-size: 3rem;
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff, #b0ffb0);
+            background: linear-gradient(135deg, #ffffff, #a8ffb8);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .subtitle {
@@ -57,7 +74,7 @@
             font-size: 1.25rem;
             margin-top: 0.75rem;
             font-weight: 400;
-            border-bottom: 1px dashed var(--accent);
+            border-bottom: 2px solid var(--palestine-green);
             display: inline-block;
             padding-bottom: 0.25rem;
         }
@@ -75,21 +92,23 @@
             margin-left: auto;
             margin-right: auto;
             font-size: 1.1rem;
-            background: rgba(45,45,45,0.5);
+            background: rgba(26,26,26,0.7);
             padding: 1.2rem 2rem;
             border-radius: 2rem;
             backdrop-filter: blur(2px);
-            border: 1px solid var(--border-subtle);
+            border: 1px solid var(--palestine-green);
+            box-shadow: 0 0 20px rgba(0, 122, 61, 0.15);
         }
 
         .section-title {
-            border-bottom: 3px solid var(--accent);
+            border-bottom: 3px solid var(--palestine-red);
             padding-bottom: 0.6rem;
             display: inline-block;
             margin-bottom: 2rem;
             font-size: 1.8rem;
             font-weight: 600;
             letter-spacing: -0.3px;
+            color: var(--palestine-green);
         }
 
         /* Projects grid - responsive, modern cards */
@@ -104,8 +123,9 @@
             background-color: var(--card-bg);
             border-radius: var(--card-radius);
             overflow: hidden;
-            transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
-            border: 1px solid var(--border-subtle);
+            transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid #333;
+            border-top: 3px solid var(--palestine-green);
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -114,8 +134,8 @@
 
         .project-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.5);
-            border-color: var(--accent);
+            box-shadow: 0 20px 30px -12px rgba(0,122,61,0.4);
+            border-color: var(--palestine-red);
         }
 
         /* ----- IMAGE CONTAINER: EXACT DIMENSIONS FROM PROVIDED SCREENSHOTS ----- */
@@ -126,19 +146,17 @@
            plus a dark background to frame them elegantly. */
         .image-container {
             width: 100%;
-            background-color: #0f0f12;
+            background-color: #0a0a0c;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-bottom: 1px solid #3a3a3a;
-            transition: background 0.2s;
-            /* No fixed height forced — let image determine natural container height,
-               but we guarantee that each image retains its intrinsic pixel-perfect look.
-               To avoid layout jumps, we respect the natural ratio, but also set 
-               max-height to keep cards balanced. However, for exact dimension fit,
-               we use object-fit: contain so that each PNG is shown entirely,
-               respecting original width/height without stretching. */
-            min-height: 180px;   /* graceful fallback */
+            border-bottom: 2px solid var(--palestine-red);
+            transition: background 0.2s, border-color 0.3s;
+            min-height: 180px;
+        }
+
+        .project-card:hover .image-container {
+            border-bottom-color: var(--syndicalist-green);
         }
 
         /* each image receives full original dimensions, no forced cropping, 
@@ -172,7 +190,7 @@
         .card-content h3 {
             margin-top: 0;
             margin-bottom: 0.75rem;
-            color: var(--accent);
+            color: var(--palestine-green);
             font-size: 1.5rem;
             font-weight: 600;
             letter-spacing: -0.2px;
@@ -189,7 +207,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background-color: var(--accent);
+            background-color: var(--palestine-red);
             color: white;
             padding: 0.6rem 1.25rem;
             text-decoration: none;
@@ -200,24 +218,26 @@
             align-self: flex-start;
             border: none;
             font-size: 0.9rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(196,30,58,0.3);
         }
 
         .btn:hover {
-            background-color: var(--accent-hover);
+            background-color: var(--red-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(76,175,80,0.25);
+            box-shadow: 0 6px 12px rgba(196,30,58,0.4);
         }
 
         .tech-badge {
             font-size: 0.7rem;
-            background: #3a3a3a;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            border: 1px solid var(--palestine-green);
             display: inline-block;
             padding: 0.2rem 0.7rem;
             border-radius: 20px;
             margin-top: 0.5rem;
-            color: #ccc;
+            color: var(--syndicalist-green);
             letter-spacing: 0.3px;
+            font-weight: 500;
         }
 
         footer {
@@ -225,13 +245,13 @@
             padding: 2rem;
             color: var(--text-muted);
             font-size: 0.9rem;
-            border-top: 1px solid var(--border-subtle);
+            border-top: 3px solid var(--palestine-red);
             margin-top: 3rem;
-            background: #111;
+            background: linear-gradient(180deg, #0a0a0a 0%, #0f0f0f 100%);
         }
 
         footer a {
-            color: var(--accent);
+            color: var(--palestine-green);
             text-decoration: none;
             font-weight: 500;
             transition: 0.2s;
@@ -239,7 +259,7 @@
 
         footer a:hover {
             text-decoration: underline;
-            color: #8bc34a;
+            color: var(--syndicalist-green);
         }
 
         @media (max-width: 720px) {
@@ -264,6 +284,36 @@
             .projects-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        /* Subtle decorative elements - Palestine flag inspired */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100vh;
+            background: linear-gradient(180deg, 
+                var(--palestine-red) 0%, 
+                var(--palestine-red) 33%, 
+                #000 33%, 
+                #000 66%, 
+                var(--palestine-green) 66%, 
+                var(--palestine-green) 100%);
+            z-index: 9999;
+            opacity: 0.7;
+        }
+
+        .image-note {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: linear-gradient(135deg, rgba(0,122,61,0.1), rgba(196,30,58,0.05));
+            padding: 0.7rem;
+            border-radius: 30px;
+            border: 1px solid var(--palestine-green);
         }
     </style>
 </head>
@@ -359,7 +409,7 @@
         </div>
 
         <!-- extra note about image fidelity -->
-        <div style="margin-top: 2.5rem; text-align: center; font-size: 0.85rem; color: #7e7e7e; background: #242424; padding: 0.7rem; border-radius: 30px;">
+        <div class="image-note">
             🖼️ All screenshots are displayed at their original dimensions & aspect ratio — no cropping or distortion. <br>
             Terminal GUIs, Wordle letter status, Creature World prompts, and FediAgri region tables are fully readable.
         </div>
