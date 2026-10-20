@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Connor Lonergan | Painter</title>
+    <title>Connor Lonergan | Painter Studio</title>
     <style>
         * {
             margin: 0;
@@ -91,7 +91,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem 1.5rem;
         }
@@ -127,7 +127,7 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem 1rem;
             margin-bottom: 1rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-subtle);
@@ -141,14 +141,14 @@
 
         .tool-label {
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .swatch {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             border: 2px solid var(--border-subtle);
             cursor: pointer;
@@ -167,8 +167,8 @@
         }
 
         input[type="color"] {
-            width: 40px;
-            height: 32px;
+            width: 38px;
+            height: 30px;
             border: 2px solid var(--border-subtle);
             border-radius: 6px;
             background: var(--card-bg);
@@ -186,8 +186,8 @@
             color: var(--text-main);
             border: 1px solid var(--border-subtle);
             border-radius: 8px;
-            padding: 0.45rem 0.9rem;
-            font-size: 0.9rem;
+            padding: 0.4rem 0.75rem;
+            font-size: 0.88rem;
             cursor: pointer;
             transition: border-color var(--transition-default), background var(--transition-default);
         }
@@ -201,12 +201,18 @@
             background: #2a1215;
         }
 
+        button.tool-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
         .canvas-wrapper {
             border: 2px solid var(--palestine-red);
             border-radius: 8px;
             overflow: hidden;
             background: #ffffff;
             line-height: 0;
+            position: relative;
         }
 
         #paintCanvas {
@@ -215,6 +221,24 @@
             cursor: crosshair;
             touch-action: none;
             background: #ffffff;
+        }
+
+        .status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            background: #141414;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.45rem 0.8rem;
+        }
+
+        .status-bar .hint {
+            color: var(--syndicalist-green);
         }
 
         .action-bar {
@@ -286,11 +310,11 @@
 
         @media (max-width: 600px) {
             .toolbar {
-                gap: 0.6rem;
+                gap: 0.5rem;
             }
             .swatch {
-                width: 26px;
-                height: 26px;
+                width: 24px;
+                height: 24px;
             }
         }
     </style>
@@ -298,7 +322,7 @@
 <body>
 
     <header>
-        <h1>🎨 Painter</h1>
+        <h1>🎨 Painter Studio</h1>
         <div class="subtitle">Hobby Game Developer | Open Source Enthusiast</div>
         <div class="nav-link"><a href="./index.html">← Back to Portfolio</a></div>
     </header>
@@ -307,31 +331,94 @@
         <h2 class="section-title">Web Painter</h2>
 
         <div class="painter-panel">
+
+            <!-- Row 1: Tools -->
             <div class="toolbar">
+                <div class="tool-group">
+                    <span class="tool-label">Tool:</span>
+                    <button class="tool-btn active" data-tool="pen" title="Freehand pen">✏️ Pen</button>
+                    <button class="tool-btn" data-tool="eraser" title="Eraser">🧽 Eraser</button>
+                    <button class="tool-btn" data-tool="select" title="Select / move / scale objects">🖱️ Select</button>
+                </div>
+                <div class="tool-group">
+                    <span class="tool-label">Size:</span>
+                    <input type="range" id="brushSize" min="1" max="60" value="6">
+                    <span id="brushSizeLabel" style="min-width:3ch;">6</span>
+                </div>
+            </div>
+
+            <!-- Row 2: Shapes -->
+            <div class="toolbar">
+                <div class="tool-group">
+                    <span class="tool-label">Shapes:</span>
+                    <button class="tool-btn" data-tool="rect" title="Rectangle">▭ Rect</button>
+                    <button class="tool-btn" data-tool="ellipse" title="Ellipse">◯ Ellipse</button>
+                    <button class="tool-btn" data-tool="line" title="Line">╱ Line</button>
+                    <button class="tool-btn" data-tool="star" title="Star">★ Star</button>
+                </div>
+                <div class="tool-group">
+                    <span class="tool-label">Custom:</span>
+                    <select id="polygonSelect" title="Regular polygon shapes">
+                        <option value="">— Polygon —</option>
+                        <option value="triangle">▲ Triangle</option>
+                        <option value="pentagon">⬟ Pentagon</option>
+                        <option value="hexagon">⬡ Hexagon</option>
+                        <option value="heptagon">⬠ Heptagon</option>
+                        <option value="octagon">🛑 Octagon</option>
+                    </select>
+                    <button class="tool-btn" id="freeformBtn" title="Click points to draw your own custom polygon shape. Double-click or press Enter to finish.">✏️ Draw Custom Shape</button>
+                </div>
+            </div>
+
+            <!-- Row 3: Style & Colors -->
+            <div class="toolbar">
+                <div class="tool-group">
+                    <span class="tool-label">Style:</span>
+                    <select id="shapeStyle" title="How new shapes are painted">
+                        <option value="fill">Fill</option>
+                        <option value="stroke">Stroke</option>
+                        <option value="fillstroke">Fill + Stroke</option>
+                        <option value="nofill">No Fill (outline only)</option>
+                    </select>
+                    <label class="tool-label" style="display:flex;align-items:center;gap:0.3rem;cursor:pointer;">
+                        <input type="checkbox" id="secondColorToggle" checked> 2nd color
+                    </label>
+                    <input type="color" id="secondaryColor" value="#c41e3a" title="Secondary color (stroke / fill+stroke)">
+                </div>
                 <div class="tool-group" id="swatches">
                     <span class="tool-label">Colors:</span>
                     <button class="swatch active" data-color="#000000" style="background:#000000" title="Black"></button>
                     <button class="swatch" data-color="#c41e3a" style="background:#c41e3a" title="Palestine Red"></button>
                     <button class="swatch" data-color="#007a3d" style="background:#007a3d" title="Palestine Green"></button>
                     <button class="swatch" data-color="#ffffff" style="background:#ffffff" title="White"></button>
-                    <input type="color" id="customColor" value="#000000" title="Custom color">
+                    <input type="color" id="customColor" value="#000000" title="Custom color picker">
                 </div>
+            </div>
 
+            <!-- Row 4: History & Object actions -->
+            <div class="toolbar">
                 <div class="tool-group">
-                    <span class="tool-label">Size:</span>
-                    <input type="range" id="brushSize" min="1" max="60" value="6">
-                    <span id="brushSizeLabel" style="min-width:2ch;">6</span>
+                    <span class="tool-label">History:</span>
+                    <button class="tool-btn" id="undoBtn" title="Undo (Ctrl+Z)">↩️ Undo</button>
+                    <button class="tool-btn" id="redoBtn" title="Redo (Ctrl+Y)">↪️ Redo</button>
                 </div>
-
                 <div class="tool-group">
-                    <span class="tool-label">Tool:</span>
-                    <button class="tool-btn active" id="penTool" title="Pen">✏️ Pen</button>
-                    <button class="tool-btn" id="eraserTool" title="Eraser">🧽 Eraser</button>
+                    <span class="tool-label">Selection:</span>
+                    <button class="tool-btn" id="groupBtn" disabled title="Group selected objects (Ctrl+G)">🔗 Group</button>
+                    <button class="tool-btn" id="ungroupBtn" disabled title="Ungroup selected group (Ctrl+Shift+G)">⛓️‍💥 Ungroup</button>
+                    <button class="tool-btn" id="dupBtn" disabled title="Duplicate selection (Ctrl+D)">📋 Duplicate</button>
+                    <button class="tool-btn" id="deleteBtn" disabled title="Delete selection (Delete key)">🗑️ Delete</button>
                 </div>
             </div>
 
             <div class="canvas-wrapper">
-                <canvas id="paintCanvas" width="960" height="560"></canvas>
+                <canvas id="paintCanvas" width="1040" height="600"></canvas>
+            </div>
+
+            <div class="status-bar">
+                <span id="statusObjects">Objects: 0</span>
+                <span id="statusSelection">Nothing selected</span>
+                <span class="hint" id="statusHint">Tip: use Select tool — click to pick, shift+click for multi-select, drag corner handles to scale.</span>
             </div>
 
             <div class="action-bar">
@@ -349,141 +436,862 @@
     </footer>
 
     <script>
-        (function () {
-            const canvas = document.getElementById('paintCanvas');
-            const ctx = canvas.getContext('2d');
+    (function () {
+        'use strict';
 
-            // Fill canvas with white so downloads have no transparent background
-            function fillWhite() {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+
+        // ===================== STATE =====================
+        let objects = [];          // list of drawable objects
+        let undoStack = [];        // snapshots (JSON strings) BEFORE each action
+        let redoStack = [];        // snapshots AFTER undone actions
+        let nextId = 1;
+
+        let tool = 'pen';          // pen | eraser | select | rect | ellipse | line | star | polygon:<name> | freeform
+        let brushColor = '#000000';
+        let secondaryColor = '#c41e3a';
+        let secondColorOn = true;
+        let brushSize = 6;
+        let shapeStyle = 'fill';   // fill | stroke | fillstroke | nofill
+
+        let drawing = false;
+        let lastPoint = null;
+        let shapeStart = null;
+        let previewObj = null;     // object being dragged out
+
+        // freeform custom-shape state
+        let freeformPts = [];
+        let lastMouse = null;
+
+        // selection state
+        let selection = new Set();      // ids of selected objects
+        let dragMode = null;            // 'move' | 'scale' | 'marquee' | null
+        let dragStart = null;
+        let marquee = null;             // {x0,y0,x1,y1}
+        let scaleHandle = null;         // which handle grabbed
+        let origBounds = null;          // bounds at drag start for scaling
+        let origObjsSnapshot = null;    // deep copy of selected objs at drag start
+
+        const HANDLE_SIZE = 10;
+
+        // ===================== OBJECT FACTORIES =====================
+        function makePathObject(type, props) {
+            // types: 'path' (pen/eraser strokes), 'rect','ellipse','line','star','polygon','freeform'
+            return Object.assign({
+                id: nextId++,
+                type: type,
+                x: 0, y: 0, w: 0, h: 0,
+                rotation: 0,
+                color: brushColor,
+                secondary: secondaryColor,
+                lineWidth: brushSize,
+                style: shapeStyle,
+                groupId: null,
+                locked: false
+            }, props);
+        }
+
+        // Regular polygons: 5 custom shapes
+        const POLYGONS = {
+            triangle: 3,
+            pentagon: 5,
+            hexagon: 6,
+            heptagon: 7,
+            octagon: 8
+        };
+
+        // ===================== GEOMETRY =====================
+        function objPoints(o) {
+            // Returns array of local-space points that define the object's bounding geometry.
+            if (o.type === 'path') return o.points;
+            if (o.type === 'line') return [{x:o.x, y:o.y}, {x:o.x2, y:o.y2}];
+            // parametric shapes: generate outline points from bbox
+            const pts = [];
+            const cx = o.x + o.w/2, cy = o.y + o.h/2;
+            const rx = Math.abs(o.w)/2, ry = Math.abs(o.h)/2;
+            if (o.type === 'rect') {
+                return [{x:o.x,y:o.y},{x:o.x+o.w,y:o.y},{x:o.x+o.w,y:o.y+o.h},{x:o.x,y:o.y+o.h}];
             }
-            fillWhite();
-
-            let drawing = false;
-            let lastPoint = null;
-            let brushColor = '#000000';
-            let brushSize = 6;
-            let tool = 'pen'; // 'pen' or 'eraser'
-
-            // --- Color swatches ---
-            const swatches = document.querySelectorAll('.swatch');
-            const customColor = document.getElementById('customColor');
-
-            function setActiveSwatch(el) {
-                swatches.forEach(s => s.classList.remove('active'));
-                if (el) el.classList.add('active');
+            if (o.type === 'ellipse') {
+                for (let i=0;i<48;i++){const a=i/48*2*Math.PI;pts.push({x:cx+rx*Math.cos(a),y:cy+ry*Math.sin(a)});}
+                return pts;
             }
-
-            swatches.forEach(swatch => {
-                swatch.addEventListener('click', () => {
-                    brushColor = swatch.dataset.color;
-                    tool = 'pen';
-                    updateToolButtons();
-                    setActiveSwatch(swatch);
-                });
-            });
-
-            customColor.addEventListener('input', () => {
-                brushColor = customColor.value;
-                tool = 'pen';
-                updateToolButtons();
-                setActiveSwatch(null);
-            });
-
-            // --- Brush size ---
-            const brushSlider = document.getElementById('brushSize');
-            const brushSizeLabel = document.getElementById('brushSizeLabel');
-            brushSlider.addEventListener('input', () => {
-                brushSize = parseInt(brushSlider.value, 10);
-                brushSizeLabel.textContent = brushSize;
-            });
-
-            // --- Tools ---
-            const penToolBtn = document.getElementById('penTool');
-            const eraserToolBtn = document.getElementById('eraserTool');
-
-            function updateToolButtons() {
-                penToolBtn.classList.toggle('active', tool === 'pen');
-                eraserToolBtn.classList.toggle('active', tool === 'eraser');
-            }
-
-            penToolBtn.addEventListener('click', () => { tool = 'pen'; updateToolButtons(); });
-            eraserToolBtn.addEventListener('click', () => { tool = 'eraser'; updateToolButtons(); });
-
-            // --- Drawing helpers ---
-            function getCanvasPoint(e) {
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return {
-                    x: (clientX - rect.left) * scaleX,
-                    y: (clientY - rect.top) * scaleY
-                };
-            }
-
-            function drawLine(from, to) {
-                ctx.beginPath();
-                ctx.moveTo(from.x, from.y);
-                ctx.lineTo(to.x, to.y);
-                ctx.strokeStyle = (tool === 'eraser') ? '#ffffff' : brushColor;
-                ctx.lineWidth = (tool === 'eraser') ? brushSize * 2 : brushSize;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.stroke();
-            }
-
-            function startDraw(e) {
-                e.preventDefault();
-                drawing = true;
-                lastPoint = getCanvasPoint(e);
-                // Dot when clicking without moving
-                drawLine(lastPoint, { x: lastPoint.x + 0.01, y: lastPoint.y + 0.01 });
-            }
-
-            function moveDraw(e) {
-                if (!drawing) return;
-                e.preventDefault();
-                const point = getCanvasPoint(e);
-                drawLine(lastPoint, point);
-                lastPoint = point;
-            }
-
-            function endDraw() {
-                drawing = false;
-                lastPoint = null;
-            }
-
-            // Mouse events
-            canvas.addEventListener('mousedown', startDraw);
-            canvas.addEventListener('mousemove', moveDraw);
-            window.addEventListener('mouseup', endDraw);
-            canvas.addEventListener('mouseleave', endDraw);
-
-            // Touch events
-            canvas.addEventListener('touchstart', startDraw, { passive: false });
-            canvas.addEventListener('touchmove', moveDraw, { passive: false });
-            canvas.addEventListener('touchend', endDraw);
-
-            // --- Clear ---
-            document.getElementById('clearBtn').addEventListener('click', () => {
-                if (confirm('Clear the canvas? Your current painting will be lost unless you downloaded it.')) {
-                    fillWhite();
+            if (o.type === 'star') {
+                for (let i=0;i<10;i++){
+                    const a=-Math.PI/2 + i*Math.PI/5;
+                    const r=(i%2===0)?1:0.45;
+                    pts.push({x:cx+rx*r*Math.cos(a), y:cy+ry*r*Math.sin(a)});
                 }
-            });
+                return pts;
+            }
+            if (o.type === 'polygon') {
+                const n = POLYGONS[o.sides] || 5;
+                for (let i=0;i<n;i++){
+                    const a=-Math.PI/2 + i*2*Math.PI/n;
+                    pts.push({x:cx+rx*Math.cos(a), y:cy+ry*Math.sin(a)});
+                }
+                return pts;
+            }
+            if (o.type === 'freeform') return o.localPts.map(p=>({x:o.x+p.x*o.w, y:o.y+p.y*o.h}));
+            return pts;
+        }
 
-            // --- Download ---
-            document.getElementById('downloadBtn').addEventListener('click', () => {
-                const link = document.createElement('a');
-                link.download = 'my-painting.png';
-                link.href = canvas.toDataURL('image/png');
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+        function objBBox(o) {
+            if (o.type === 'path') {
+                let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+                for (const p of o.points){
+                    minX=Math.min(minX,p.x); minY=Math.min(minY,p.y);
+                    maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y);
+                }
+                const pad=(o.lineWidth||1)/2+2;
+                return {x:minX-pad,y:minY-pad,w:(maxX-minX)+pad*2,h:(maxY-minY)+pad*2};
+            }
+            if (o.type === 'line') {
+                return {x:Math.min(o.x,o.x2), y:Math.min(o.y,o.y2),
+                        w:Math.abs(o.x2-o.x), h:Math.abs(o.y2-o.y)};
+            }
+            return {x:Math.min(o.x,o.x+o.w), y:Math.min(o.y,o.y+o.h),
+                    w:Math.abs(o.w), h:Math.abs(o.h)};
+        }
+
+        function selectionBounds() {
+            const sel = objects.filter(o=>selection.has(o.id));
+            if (!sel.length) return null;
+            let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+            for (const o of sel){
+                const b=objBBox(o);
+                minX=Math.min(minX,b.x); minY=Math.min(minY,b.y);
+                maxX=Math.max(maxX,b.x+b.w); maxY=Math.max(maxY,b.y+b.h);
+            }
+            return {x:minX,y:minY,w:maxX-minX,h:maxY-minY};
+        }
+
+        function hitTest(pt) {
+            // topmost first
+            for (let i=objects.length-1;i>=0;i--){
+                const o=objects[i];
+                if (pointNearObject(pt,o)) return o;
+            }
+            return null;
+        }
+
+        function pointNearObject(pt,o) {
+            if (o.locked) return false;
+            const tol=Math.max((o.lineWidth||2)/2+4, 6);
+            if (o.type==='path' || o.type==='line' || o.style==='stroke' || o.style==='nofill'){
+                // near any edge segment
+                const pts=objPoints(o);
+                for(let i=0;i<pts.length-1;i++) if(distToSeg(pt,pts[i],pts[i+1])<=tol) return true;
+                if(pts.length>2 && distToSeg(pt,pts[pts.length-1],pts[0])<=tol) return true;
+                return false;
+            }
+            const b=objBBox(o);
+            return pt.x>=b.x-tol && pt.x<=b.x+b.w+tol && pt.y>=b.y-tol && pt.y<=b.y+b.h+tol;
+        }
+
+        function distToSeg(p,a,b){
+            const dx=b.x-a.x, dy=b.y-a.y;
+            const len2=dx*dx+dy*dy;
+            if(len2===0) return Math.hypot(p.x-a.x,p.y-a.y);
+            let t=((p.x-a.x)*dx+(p.y-a.y)*dy)/len2;
+            t=Math.max(0,Math.min(1,t));
+            return Math.hypot(p.x-(a.x+t*dx), p.y-(a.y+t*dy));
+        }
+
+        // ===================== RENDERING =====================
+        function applyStyle(o, buildFn) {
+            buildFn();
+            const style=o.style||'fill';
+            ctx.lineWidth=o.lineWidth||2;
+            ctx.lineCap='round';
+            ctx.lineJoin='round';
+            if(style==='fill'){ ctx.fillStyle=o.color; ctx.fill(); }
+            else if(style==='stroke'||style==='nofill'){ ctx.strokeStyle=o.color; ctx.stroke(); }
+            else if(style==='fillstroke'){
+                ctx.fillStyle=o.color; ctx.fill();
+                ctx.strokeStyle=o.secondary||'#000'; ctx.stroke();
+            }
+        }
+
+        function tracePath(o){
+            ctx.beginPath();
+            if(o.type==='path'){
+                const p=o.points;
+                ctx.moveTo(p[0].x,p[0].y);
+                for(let i=1;i<p.length;i++) ctx.lineTo(p[i].x,p[i].y);
+            } else if(o.type==='line'){
+                ctx.moveTo(o.x,o.y); ctx.lineTo(o.x2,o.y2);
+            } else {
+                const pts=objPoints(o);
+                ctx.moveTo(pts[0].x,pts[0].y);
+                for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
+                ctx.closePath();
+            }
+        }
+
+        function drawObject(o){
+            if(o.type==='path'){
+                ctx.beginPath();
+                const p=o.points;
+                ctx.moveTo(p[0].x,p[0].y);
+                for(let i=1;i<p.length;i++) ctx.lineTo(p[i].x,p[i].y);
+                ctx.strokeStyle=o.erase?'#ffffff':o.color;
+                ctx.lineWidth=o.lineWidth||4;
+                ctx.lineCap='round'; ctx.lineJoin='round';
+                ctx.stroke();
+                return;
+            }
+            if(o.type==='line'){
+                ctx.beginPath(); ctx.moveTo(o.x,o.y); ctx.lineTo(o.x2,o.y2);
+                ctx.strokeStyle=o.color; ctx.lineWidth=o.lineWidth||2; ctx.lineCap='round';
+                ctx.stroke();
+                return;
+            }
+            applyStyle(o, ()=>tracePath(o));
+        }
+
+        function render(){
+            ctx.fillStyle='#ffffff';
+            ctx.fillRect(0,0,W,H);
+            for(const o of objects) drawObject(o);
+            if(previewObj) drawObject(previewObj);
+
+            // freeform in-progress
+            if(tool==='freeform' && freeformPts.length){
+                ctx.save();
+                // rubber band to current mouse
+                if(lastMouse){
+                    ctx.beginPath();
+                    ctx.moveTo(freeformPts[freeformPts.length-1].x,freeformPts[freeformPts.length-1].y);
+                    ctx.lineTo(lastMouse.x,lastMouse.y);
+                    ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+                    ctx.stroke();
+                }
+                // placed outline
+                ctx.beginPath();
+                ctx.moveTo(freeformPts[0].x,freeformPts[0].y);
+                for(let i=1;i<freeformPts.length;i++) ctx.lineTo(freeformPts[i].x,freeformPts[i].y);
+                if(freeformPts.length>2) ctx.closePath();
+                ctx.strokeStyle=brushColor; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+                ctx.stroke(); ctx.setLineDash([]);
+                ctx.restore();
+                for(const p of freeformPts){
+                    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,7);
+                    ctx.fillStyle=brushColor; ctx.fill();
+                }
+            }
+
+            drawSelectionUI();
+            updateStatus();
+        }
+
+        function drawSelectionUI(){
+            const b=selectionBounds();
+            if(b){
+                ctx.save();
+                ctx.strokeStyle='#c41e3a';
+                ctx.lineWidth=1.5;
+                ctx.setLineDash([6,4]);
+                ctx.strokeRect(b.x,b.y,b.w,b.h);
+                ctx.setLineDash([]);
+                // handles
+                const hs=HANDLE_SIZE;
+                const handles=getHandles(b);
+                ctx.fillStyle='#007a3d';
+                ctx.strokeStyle='#0a0a0a';
+                for(const h of Object.values(handles)){
+                    ctx.fillRect(h.x-hs/2,h.y-hs/2,hs,hs);
+                    ctx.strokeRect(h.x-hs/2,h.y-hs/2,hs,hs);
+                }
+                ctx.restore();
+            }
+            // individual outlines for multi-select clarity
+            for(const o of objects){
+                if(selection.has(o.id)){
+                    const ob=objBBox(o);
+                    ctx.strokeStyle='rgba(46,204,113,0.55)';
+                    ctx.lineWidth=1;
+                    ctx.strokeRect(ob.x,ob.y,ob.w,ob.h);
+                }
+            }
+            if(marquee){
+                ctx.save();
+                ctx.strokeStyle='#2ecc71';
+                ctx.fillStyle='rgba(46,204,113,0.10)';
+                ctx.setLineDash([4,4]);
+                const mx=Math.min(marquee.x0,marquee.x1), my=Math.min(marquee.y0,marquee.y1);
+                const mw=Math.abs(marquee.x1-marquee.x0), mh=Math.abs(marquee.y1-marquee.y0);
+                ctx.fillRect(mx,my,mw,mh);
+                ctx.strokeRect(mx,my,mw,mh);
+                ctx.restore();
+            }
+        }
+
+        function getHandles(b){
+            const inset=0;
+            return {
+                nw:{x:b.x-inset,y:b.y-inset}, ne:{x:b.x+b.w+inset,y:b.y-inset},
+                sw:{x:b.x-inset,y:b.y+b.h+inset}, se:{x:b.x+b.w+inset,y:b.y+b.h+inset}
+            };
+        }
+
+        function handleAt(pt){
+            const b=selectionBounds();
+            if(!b) return null;
+            const handles=getHandles(b);
+            for(const [name,h] of Object.entries(handles)){
+                if(Math.abs(pt.x-h.x)<=HANDLE_SIZE && Math.abs(pt.y-h.y)<=HANDLE_SIZE) return name;
+            }
+            return null;
+        }
+
+        // ===================== HISTORY (UNDO/REDO) =====================
+        function snapshot(){ return JSON.stringify(objects); }
+
+        function pushHistory(beforeSnap){
+            undoStack.push(beforeSnap);
+            if(undoStack.length>60) undoStack.shift();
+            redoStack.length=0;
+            updateHistoryButtons();
+        }
+
+        function commitAction(fn){
+            const before=snapshot();
+            fn();
+            if(snapshot()!==before){ pushHistory(before); }
+            render();
+        }
+
+        function undo(){
+            if(!undoStack.length) return;
+            redoStack.push(snapshot());
+            objects=JSON.parse(undoStack.pop());
+            clearSelection();
+            updateHistoryButtons();
+            render();
+        }
+
+        function redo(){
+            if(!redoStack.length) return;
+            undoStack.push(snapshot());
+            objects=JSON.parse(redoStack.pop());
+            clearSelection();
+            updateHistoryButtons();
+            render();
+        }
+
+        const undoBtn=document.getElementById('undoBtn');
+        const redoBtn=document.getElementById('redoBtn');
+        function updateHistoryButtons(){
+            undoBtn.disabled=!undoStack.length;
+            redoBtn.disabled=!redoStack.length;
+        }
+        undoBtn.addEventListener('click',undo);
+        redoBtn.addEventListener('click',redo);
+
+        // ===================== TOOLS UI =====================
+        const toolBtns=document.querySelectorAll('.tool-btn[data-tool]');
+        const freeformBtn=document.getElementById('freeformBtn');
+        const polygonSelect=document.getElementById('polygonSelect');
+
+        function setTool(t){
+            if(tool==='freeform' && t!=='freeform'){ freeformPts=[]; lastMouse=null; }
+            tool=t;
+            toolBtns.forEach(b=>b.classList.toggle('active', b.dataset.tool===t));
+            freeformBtn.classList.toggle('active', t==='freeform');
+            if(t.startsWith('polygon:')) polygonSelect.value=t.slice(8);
+            else if(t!=='freeform') polygonSelect.value='';
+            canvas.style.cursor = (t==='select')?'default':'crosshair';
+            if(t!=='select') clearSelection();
+            render();
+        }
+
+        toolBtns.forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
+
+        polygonSelect.addEventListener('change',()=>{
+            const v=polygonSelect.value;
+            if(v && POLYGONS[v]) setTool('polygon:'+v);
+        });
+
+        freeformBtn.addEventListener('click',()=>{
+            setTool(tool==='freeform'?'pen':'freeform');
+            if(tool==='freeform') setHint('Custom shape: click to place points, double-click or press Enter to finish, Escape to cancel.');
+        });
+
+        // colors
+        const swatches=document.querySelectorAll('.swatch');
+        const customColor=document.getElementById('customColor');
+        const secondaryInput=document.getElementById('secondaryColor');
+        const secondToggle=document.getElementById('secondColorToggle');
+
+        function setActiveSwatch(el){
+            swatches.forEach(s=>s.classList.remove('active'));
+            if(el) el.classList.add('active');
+        }
+        swatches.forEach(s=>s.addEventListener('click',()=>{
+            brushColor=s.dataset.color;
+            setActiveSwatch(s);
+            applyColorToSelection();
+        }));
+        customColor.addEventListener('input',()=>{
+            brushColor=customColor.value;
+            setActiveSwatch(null);
+            applyColorToSelection();
+        });
+        secondaryInput.addEventListener('input',()=>{
+            secondaryColor=secondaryInput.value;
+            if(selection.size) commitAction(()=>{
+                objects.filter(o=>selection.has(o.id)).forEach(o=>o.secondary=secondaryColor);
             });
-        })();
+        });
+        secondToggle.addEventListener('change',()=>{ secondColorOn=secondToggle.checked; });
+
+        function applyColorToSelection(){
+            if(tool==='select' && selection.size){
+                commitAction(()=>{
+                    objects.filter(o=>selection.has(o.id)).forEach(o=>o.color=brushColor);
+                });
+            }
+        }
+
+        const brushSlider=document.getElementById('brushSize');
+        const brushSizeLabel=document.getElementById('brushSizeLabel');
+        brushSlider.addEventListener('input',()=>{
+            brushSize=parseInt(brushSlider.value,10);
+            brushSizeLabel.textContent=brushSize;
+        });
+
+        const styleSelect=document.getElementById('shapeStyle');
+        styleSelect.addEventListener('change',()=>{
+            shapeStyle=styleSelect.value;
+            if(shapeStyle==='fillstroke' && !secondColorOn){ secondToggle.checked=true; secondColorOn=true; }
+        });
+
+        // ===================== SELECTION HELPERS =====================
+        function clearSelection(){
+            selection.clear();
+            updateSelectionButtons();
+        }
+        function selectOnly(id){ selection.clear(); if(id!=null) selection.add(id); updateSelectionButtons(); }
+        function toggleSelect(id){ if(selection.has(id)) selection.delete(id); else selection.add(id); updateSelectionButtons(); }
+
+        function updateSelectionButtons(){
+            // prune stale ids (e.g. after undo restored an older object list)
+            const validIds=new Set(objects.map(o=>o.id));
+            for(const id of Array.from(selection)) if(!validIds.has(id)) selection.delete(id);
+            const sel=objects.filter(o=>selection.has(o.id));
+            const hasGroup=sel.some(o=>o.groupId!=null);
+            document.getElementById('groupBtn').disabled = sel.length<2 || hasGroup;
+            document.getElementById('ungroupBtn').disabled = !hasGroup;
+            document.getElementById('dupBtn').disabled = sel.length===0;
+            document.getElementById('deleteBtn').disabled = sel.length===0;
+        }
+
+        function selectedObjects(){ return objects.filter(o=>selection.has(o.id)); }
+
+        function expandSelection(sel){
+            // selecting one member of a group selects whole group
+            const ids=new Set(sel);
+            for(const o of objects){
+                if(o.groupId!=null && sel.some(s=>s.id===o.id && s.groupId===o.groupId)) ids.add(o.id);
+            }
+            return ids;
+        }
+
+        // Group / Ungroup / Duplicate / Delete buttons
+        document.getElementById('groupBtn').addEventListener('click',()=>{
+            const sel=selectedObjects();
+            if(sel.length<2) return;
+            commitAction(()=>{
+                const gid=nextId++;
+                sel.forEach(o=>o.groupId=gid);
+            });
+            setHint('Grouped '+sel.length+' objects. Clicking any member now selects the whole group.');
+        });
+
+        document.getElementById('ungroupBtn').addEventListener('click',()=>{
+            commitAction(()=>{
+                selectedObjects().forEach(o=>o.groupId=null);
+            });
+            setHint('Ungrouped selection.');
+        });
+
+        document.getElementById('dupBtn').addEventListener('click',duplicateSelection);
+        document.getElementById('deleteBtn').addEventListener('click',deleteSelection);
+
+        function duplicateSelection(){
+            const sel=selectedObjects();
+            if(!sel.length) return;
+            commitAction(()=>{
+                const copies=sel.map(o=>{
+                    const c=JSON.parse(JSON.stringify(o));
+                    c.id=nextId++;
+                    if(c.type==='path') c.points=c.points.map(p=>({x:p.x+20,y:p.y+20}));
+                    else if(c.type==='line'){ c.x+=20;c.y+=20;c.x2+=20;c.y2+=20; }
+                    else { c.x+=20; c.y+=20; }
+                    c.groupId=null;
+                    return c;
+                });
+                objects.push(...copies);
+                selection=new Set(copies.map(c=>c.id));
+            });
+            updateSelectionButtons();
+        }
+
+        function deleteSelection(){
+            if(!selection.size) return;
+            commitAction(()=>{
+                objects=objects.filter(o=>!selection.has(o.id));
+                selection.clear();
+            });
+            updateSelectionButtons();
+        }
+
+        // ===================== POINTER EVENTS =====================
+        function getCanvasPoint(e){
+            const rect=canvas.getBoundingClientRect();
+            const scaleX=W/rect.width, scaleY=H/rect.height;
+            const clientX=e.touches?e.touches[0].clientX:e.clientX;
+            const clientY=e.touches?e.touches[0].clientY:e.clientY;
+            return {x:(clientX-rect.left)*scaleX, y:(clientY-rect.top)*scaleY};
+        }
+
+        function isShapeTool(){
+            return ['rect','ellipse','line','star'].includes(tool) || tool.startsWith('polygon:');
+        }
+
+        function onDown(e){
+            e.preventDefault();
+            const pt=getCanvasPoint(e);
+
+            // ---- Freeform custom shape ----
+            if(tool==='freeform'){
+                const now=Date.now();
+                if(e.detail===2 || (freeformLastClick && now-freeformLastClick<350)){
+                    finishFreeform();
+                    return;
+                }
+                freeformLastClick=now;
+                freeformPts.push(pt);
+                render();
+                return;
+            }
+
+            // ---- Select tool ----
+            if(tool==='select'){
+                const h=handleAt(pt);
+                if(h && selection.size){
+                    dragMode='scale';
+                    scaleHandle=h;
+                    origBounds=selectionBounds();
+                    origObjsSnapshot=JSON.parse(JSON.stringify(selectedObjects()));
+                    dragStart=pt;
+                    return;
+                }
+                const hit=hitTest(pt);
+                if(hit){
+                    if(e.shiftKey){ toggleSelect(hit.id); }
+                    else if(!selection.has(hit.id)){ selectOnly(hit.id); }
+                    // expand groups
+                    selection=expandSelection(selectedObjects());
+                    updateSelectionButtons();
+                    dragMode='move';
+                    dragStart=pt;
+                    origObjsSnapshot=JSON.parse(JSON.stringify(selectedObjects()));
+                } else {
+                    if(!e.shiftKey) clearSelection();
+                    dragMode='marquee';
+                    marquee={x0:pt.x,y0:pt.y,x1:pt.x,y1:pt.y};
+                }
+                render();
+                return;
+            }
+
+            // ---- Pen / Eraser ----
+            if(tool==='pen'||tool==='eraser'){
+                drawing=true;
+                const erase=(tool==='eraser');
+                const obj=makePathObject('path',{
+                    points:[pt],
+                    color:erase?'#ffffff':brushColor,
+                    erase:erase,
+                    lineWidth:erase?brushSize*2:brushSize,
+                    style:'stroke'
+                });
+                previewObj=obj;
+                lastPoint=pt;
+                render();
+                return;
+            }
+
+            // ---- Shapes ----
+            if(isShapeTool()){
+                drawing=true;
+                shapeStart=pt;
+                const type=tool.startsWith('polygon:')?'polygon':tool;
+                const sides=type==='polygon'?tool.slice(8):undefined;
+                previewObj=makePathObject(type,{
+                    x:pt.x,y:pt.y,w:0,h:0,sides:sides,
+                    x2:pt.x,y2:pt.y,
+                    color:brushColor,
+                    secondary:secondColorOn?secondaryColor:brushColor,
+                    style:shapeStyle,
+                    lineWidth:brushSize
+                });
+                render();
+            }
+        }
+
+        let freeformLastClick=0;
+
+        function onMove(e){
+            const pt=getCanvasPoint(e);
+
+            if(tool==='freeform' && freeformPts.length){
+                lastMouse = pt;
+                render();
+                if(e.cancelable) e.preventDefault();
+                return;
+            }
+
+            if(dragMode==='marquee'){
+                marquee.x1=pt.x; marquee.y1=pt.y;
+                render();
+                return;
+            }
+
+            if(dragMode==='move'){
+                const dx=pt.x-dragStart.x, dy=pt.y-dragStart.y;
+                const sel=selectedObjects();
+                sel.forEach((o,i)=>{
+                    const src=origObjsSnapshot.find(s=>s.id===o.id);
+                    if(!src) return;
+                    if(o.type==='path') o.points=src.points.map(p=>({x:p.x+dx,y:p.y+dy}));
+                    else if(o.type==='line'){ o.x=src.x+dx;o.y=src.y+dy;o.x2=src.x2+dx;o.y2=src.y2+dy; }
+                    else { o.x=src.x+dx; o.y=src.y+dy; }
+                });
+                render();
+                return;
+            }
+
+            if(dragMode==='scale'){
+                const b=origBounds;
+                let sx=1, sy=1;
+                const dx=(pt.x-dragStart.x), dy=(pt.y-dragStart.y);
+                if(scaleHandle.includes('e')) sx=Math.max(0.05,(b.w+dx)/b.w);
+                if(scaleHandle.includes('s')) sy=Math.max(0.05,(b.h+dy)/b.h);
+                if(scaleHandle.includes('w')) sx=Math.max(0.05,(b.w-dx)/b.w);
+                if(scaleHandle.includes('n')) sy=Math.max(0.05,(b.h-dy)/b.h);
+                // anchor opposite corner
+                const ax=(scaleHandle.includes('w'))?b.x+b.w:b.x;
+                const ay=(scaleHandle.includes('n'))?b.y+b.h:b.y;
+                const sel=selectedObjects();
+                sel.forEach(o=>{
+                    const src=origObjsSnapshot.find(s=>s.id===o.id);
+                    if(!src) return;
+                    const clone=JSON.parse(JSON.stringify(src));
+                    if(clone.type==='path'){
+                        clone.points=clone.points.map(p=>({x:ax+(p.x-ax)*sx, y:ay+(p.y-ay)*sy}));
+                        clone.lineWidth=(src.lineWidth||2)*Math.max(0.2,Math.min(sx,sy));
+                        Object.assign(o,clone);
+                    } else if(clone.type==='line'){
+                        clone.x=ax+(clone.x-ax)*sx; clone.y=ay+(clone.y-ay)*sy;
+                        clone.x2=ax+(clone.x2-ax)*sx; clone.y2=ay+(clone.y2-ay)*sy;
+                        clone.lineWidth=(src.lineWidth||2)*Math.max(0.2,Math.min(sx,sy));
+                        Object.assign(o,clone);
+                    } else {
+                        clone.x=ax+(clone.x-ax)*sx; clone.y=ay+(clone.y-ay)*sy;
+                        clone.w=clone.w*sx; clone.h=clone.h*sy;
+                        Object.assign(o,clone);
+                    }
+                });
+                render();
+                return;
+            }
+
+            if(!drawing) return;
+            if(e.cancelable) e.preventDefault();
+
+            if(previewObj && previewObj.type==='path'){
+                previewObj.points.push(pt);
+                render();
+                return;
+            }
+            if(previewObj){
+                if(previewObj.type==='line'){
+                    previewObj.x2=pt.x; previewObj.y2=pt.y;
+                } else {
+                    previewObj.w=pt.x-shapeStart.x;
+                    previewObj.h=pt.y-shapeStart.y;
+                    if(e.shiftKey){ // constrain square/circle
+                        const m=Math.max(Math.abs(previewObj.w),Math.abs(previewObj.h));
+                        previewObj.w=Math.sign(previewObj.w||1)*m;
+                        previewObj.h=Math.sign(previewObj.h||1)*m;
+                    }
+                }
+                render();
+            }
+        }
+
+        function onUp(e){
+            if(dragMode==='marquee' && marquee){
+                const mx=Math.min(marquee.x0,marquee.x1),my=Math.min(marquee.y0,marquee.y1);
+                const mw=Math.abs(marquee.x1-marquee.x0),mh=Math.abs(marquee.y1-marquee.y0);
+                if(mw>4&&mh>4){
+                    const hits=objects.filter(o=>{
+                        const b=objBBox(o);
+                        return b.x+b.w>=mx && b.x<=mx+mw && b.y+b.h>=my && b.y<=my+mh;
+                    });
+                    selection=expandSelection(hits);
+                    updateSelectionButtons();
+                }
+                marquee=null;
+                dragMode=null;
+                render();
+                return;
+            }
+            if(dragMode==='move'||dragMode==='scale'){
+                const before=origBeforeSnap;
+                if(snapshot()!==before) pushHistory(before);
+                dragMode=null; dragStart=null; origObjsSnapshot=null; origBounds=null; scaleHandle=null;
+                render();
+                return;
+            }
+            if(!drawing) return;
+            drawing=false;
+
+            if(previewObj){
+                if(previewObj.type==='path'){
+                    if(previewObj.points.length>1) commitAction(()=>objects.push(previewObj));
+                } else if(previewObj.type==='line'){
+                    if(Math.hypot(previewObj.x2-previewObj.x,previewObj.y2-previewObj.y)>2)
+                        commitAction(()=>objects.push(previewObj));
+                } else {
+                    if(Math.abs(previewObj.w)>2 && Math.abs(previewObj.h)>2){
+                        // normalize negative w/h
+                        if(previewObj.w<0){previewObj.x+=previewObj.w;previewObj.w=-previewObj.w;}
+                        if(previewObj.h<0){previewObj.y+=previewObj.h;previewObj.h=-previewObj.h;}
+                        commitAction(()=>objects.push(previewObj));
+                    }
+                }
+            }
+            previewObj=null;
+            render();
+        }
+
+        // remember history snapshot when a drag begins
+        let origBeforeSnap=null;
+        const _onDown=onDown;
+        function onDownWrapped(e){
+            origBeforeSnap=snapshot();
+            _onDown(e);
+        }
+
+        canvas.addEventListener('mousedown',onDownWrapped);
+        window.addEventListener('mousemove',onMove);
+        window.addEventListener('mouseup',onUp);
+        canvas.addEventListener('touchstart',onDownWrapped,{passive:false});
+        canvas.addEventListener('touchmove',onMove,{passive:false});
+        canvas.addEventListener('touchend',onUp);
+
+        // ===================== FREEFORM FINISH =====================
+        function finishFreeform(){
+            if(freeformPts.length>=3){
+                const xs=freeformPts.map(p=>p.x), ys=freeformPts.map(p=>p.y);
+                const minX=Math.min(...xs), minY=Math.min(...ys);
+                const w=Math.max(...xs)-minX, h=Math.max(...ys)-minY;
+                if(w>2&&h>2){
+                    const localPts=freeformPts.map(p=>({x:(p.x-minX)/w, y:(p.y-minY)/h}));
+                    commitAction(()=>objects.push(makePathObject('freeform',{
+                        x:minX,y:minY,w:w,h:h,localPts:localPts,
+                        color:brushColor,
+                        secondary:secondColorOn?secondaryColor:brushColor,
+                        style:shapeStyle,lineWidth:brushSize
+                    })));
+                    setHint('Custom shape added! Keep clicking to draw another, or switch tools.');
+                }
+            }
+            freeformPts=[];
+            lastMouse=null;
+            render();
+        }
+
+        // ===================== KEYBOARD SHORTCUTS =====================
+        window.addEventListener('keydown',(e)=>{
+            const k=e.key.toLowerCase();
+            if((e.ctrlKey||e.metaKey)&&k==='z'&&!e.shiftKey){ e.preventDefault(); undo(); return; }
+            if((e.ctrlKey||e.metaKey)&&(k==='y'||(k==='z'&&e.shiftKey))){ e.preventDefault(); redo(); return; }
+            if((e.ctrlKey||e.metaKey)&&k==='g'){ e.preventDefault();
+                if(e.shiftKey) document.getElementById('ungroupBtn').click();
+                else document.getElementById('groupBtn').click();
+                return; }
+            if((e.ctrlKey||e.metaKey)&&k==='d'){ e.preventDefault(); duplicateSelection(); return; }
+            if(k==='delete'||k==='backspace'){
+                if(selection.size && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='SELECT'){
+                    e.preventDefault(); deleteSelection();
+                }
+                return;
+            }
+            if(k==='escape'){
+                if(tool==='freeform'){ freeformPts=[]; lastMouse=null; setTool('pen'); }
+                clearSelection(); render();
+                return;
+            }
+            if(k==='enter' && tool==='freeform'){ finishFreeform(); return; }
+            if(k==='a'&&(e.ctrlKey||e.metaKey)){
+                e.preventDefault();
+                selection=expandSelection(objects.slice());
+                updateSelectionButtons(); render();
+            }
+        });
+
+        // ===================== STATUS / HINT =====================
+        const statusObjects=document.getElementById('statusObjects');
+        const statusSelection=document.getElementById('statusSelection');
+        const statusHint=document.getElementById('statusHint');
+        const defaultHint=statusHint.textContent;
+        function setHint(t){ statusHint.textContent=t; clearTimeout(setHint._t); setHint._t=setTimeout(()=>{statusHint.textContent=defaultHint;},6000); }
+        function updateStatus(){
+            statusObjects.textContent='Objects: '+objects.length;
+            const n=selection.size;
+            const groups=new Set(selectedObjects().map(o=>o.groupId).filter(g=>g!=null));
+            statusSelection.textContent = n===0 ? 'Nothing selected'
+                : 'Selected: '+n+' object'+(n>1?'s':'')+(groups.size?' (group)':'');
+        }
+
+        // ===================== CLEAR / DOWNLOAD =====================
+        document.getElementById('clearBtn').addEventListener('click',()=>{
+            if(confirm('Clear the canvas? Everything will be removed (you can still Undo).')){
+                commitAction(()=>{ objects=[]; clearSelection(); });
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click',()=>{
+            // render without selection UI
+            const savedSel=new Set(selection);
+            selection.clear();
+            const tmpMarquee=marquee; marquee=null;
+            const tmpFF=freeformPts.slice(); freeformPts=[];
+            const tmpPreview=previewObj; previewObj=null;
+            render();
+            const link=document.createElement('a');
+            link.download='my-painting.png';
+            link.href=canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            selection=savedSel; marquee=tmpMarquee; freeformPts=tmpFF; previewObj=tmpPreview;
+            render();
+        });
+
+        // ===================== INIT =====================
+        ctx.fillStyle='#ffffff';
+        ctx.fillRect(0,0,W,H);
+        updateHistoryButtons();
+        render();
+    })();
     </script>
 </body>
 </html>
