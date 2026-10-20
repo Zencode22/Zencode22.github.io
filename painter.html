@@ -878,6 +878,9 @@
         function toggleSelect(id){ if(selection.has(id)) selection.delete(id); else selection.add(id); updateSelectionButtons(); }
 
         function updateSelectionButtons(){
+            // prune stale ids (e.g. after undo restored an older object list)
+            const validIds=new Set(objects.map(o=>o.id));
+            for(const id of Array.from(selection)) if(!validIds.has(id)) selection.delete(id);
             const sel=objects.filter(o=>selection.has(o.id));
             const hasGroup=sel.some(o=>o.groupId!=null);
             document.getElementById('groupBtn').disabled = sel.length<2 || hasGroup;
