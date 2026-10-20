@@ -109,14 +109,21 @@
             font-weight: 600;
             letter-spacing: -0.3px;
             color: var(--palestine-green);
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
         }
 
         /* Projects grid - responsive, modern cards */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 2rem;
             margin-top: 1rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .project-card {
@@ -322,6 +329,7 @@
     <header>
         <h1>Connor Lonergan</h1>
         <div class="subtitle">Hobby Game Developer | Open Source Enthusiast</div>
+        <p style="margin-top: 1rem;"><a href="./painter.html" style="color: var(--syndicalist-green); text-decoration: none; font-weight: 600;">🎨 Try my Web Painter →</a></p>
     </header>
 
     <div class="container">

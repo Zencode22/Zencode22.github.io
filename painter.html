@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Connor Lonergan | Painter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Palestine & Green Syndicalism Theme: Red, Green, Black */
+            --bg-color: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-main: #f5f5f5;
+            --text-muted: #b8b8b8;
+            --palestine-red: #c41e3a;
+            --palestine-green: #007a3d;
+            --syndicalist-green: #2ecc71;
+            --accent: #007a3d;
+            --accent-hover: #00964a;
+            --red-accent: #c41e3a;
+            --red-hover: #e0284a;
+            --border-subtle: #333;
+            --card-radius: 1rem;
+            --transition-default: 0.2s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1.5rem 2rem;
+            border-bottom: 3px solid var(--palestine-red);
+            background: linear-gradient(145deg, #0f0f0f 0%, #0a0a0a 100%);
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--palestine-red), var(--palestine-green), #000);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            letter-spacing: 0.5px;
+            color: var(--text-main);
+        }
+
+        header .subtitle {
+            color: var(--palestine-green);
+            font-size: 1.05rem;
+            margin-top: 0.5rem;
+            border-bottom: 2px solid var(--palestine-green);
+            display: inline-block;
+            padding-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.2rem;
+        }
+
+        .nav-link a {
+            color: var(--syndicalist-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color var(--transition-default);
+        }
+
+        .nav-link a:hover {
+            color: var(--red-hover);
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .section-title {
+            color: var(--palestine-green);
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: var(--palestine-red);
+            margin: 0.5rem auto 0;
+            border-radius: 2px;
+        }
+
+        .painter-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--palestine-green);
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 122, 61, 0.15);
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid var(--border-subtle);
+            cursor: pointer;
+            transition: transform var(--transition-default), border-color var(--transition-default);
+            padding: 0;
+        }
+
+        .swatch:hover {
+            transform: scale(1.15);
+        }
+
+        .swatch.active {
+            border-color: var(--text-main);
+            transform: scale(1.15);
+            box-shadow: 0 0 8px rgba(245, 245, 245, 0.4);
+        }
+
+        input[type="color"] {
+            width: 40px;
+            height: 32px;
+            border: 2px solid var(--border-subtle);
+            border-radius: 6px;
+            background: var(--card-bg);
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        input[type="range"] {
+            accent-color: var(--palestine-green);
+            cursor: pointer;
+        }
+
+        select, button.tool-btn {
+            background: #222;
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color var(--transition-default), background var(--transition-default);
+        }
+
+        select:hover, button.tool-btn:hover {
+            border-color: var(--palestine-green);
+        }
+
+        button.tool-btn.active {
+            border-color: var(--palestine-red);
+            background: #2a1215;
+        }
+
+        .canvas-wrapper {
+            border: 2px solid var(--palestine-red);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            line-height: 0;
+        }
+
+        #paintCanvas {
+            display: block;
+            width: 100%;
+            cursor: crosshair;
+            touch-action: none;
+            background: #ffffff;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--palestine-red);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.7rem 1.4rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background var(--transition-default), box-shadow var(--transition-default);
+        }
+
+        .btn:hover {
+            background: var(--red-hover);
+            box-shadow: 0 0 12px rgba(196, 30, 58, 0.5);
+        }
+
+        .btn.green {
+            background: var(--palestine-green);
+        }
+
+        .btn.green:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 12px rgba(0, 122, 61, 0.5);
+        }
+
+        .btn.secondary {
+            background: #2a2a2a;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn.secondary:hover {
+            background: #333;
+            border-color: var(--syndicalist-green);
+            box-shadow: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            margin-top: 2rem;
+            border-top: 2px solid var(--palestine-red);
+            background: #0f0f0f;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--palestine-green);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--syndicalist-green);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .toolbar {
+                gap: 0.6rem;
+            }
+            .swatch {
+                width: 26px;
+                height: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎨 Painter</h1>
+        <div class="subtitle">Hobby Game Developer | Open Source Enthusiast</div>
+        <div class="nav-link"><a href="./index.html">← Back to Portfolio</a></div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Web Painter</h2>
+
+        <div class="painter-panel">
+            <div class="toolbar">
+                <div class="tool-group" id="swatches">
+                    <span class="tool-label">Colors:</span>
+                    <button class="swatch active" data-color="#000000" style="background:#000000" title="Black"></button>
+                    <button class="swatch" data-color="#c41e3a" style="background:#c41e3a" title="Palestine Red"></button>
+                    <button class="swatch" data-color="#007a3d" style="background:#007a3d" title="Palestine Green"></button>
+                    <button class="swatch" data-color="#ffffff" style="background:#ffffff" title="White"></button>
+                    <input type="color" id="customColor" value="#000000" title="Custom color">
+                </div>
+
+                <div class="tool-group">
+                    <span class="tool-label">Size:</span>
+                    <input type="range" id="brushSize" min="1" max="60" value="6">
+                    <span id="brushSizeLabel" style="min-width:2ch;">6</span>
+                </div>
+
+                <div class="tool-group">
+                    <span class="tool-label">Tool:</span>
+                    <button class="tool-btn active" id="penTool" title="Pen">✏️ Pen</button>
+                    <button class="tool-btn" id="eraserTool" title="Eraser">🧽 Eraser</button>
+                </div>
+            </div>
+
+            <div class="canvas-wrapper">
+                <canvas id="paintCanvas" width="960" height="560"></canvas>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn green" id="downloadBtn">⬇️ Download Painting (PNG)</button>
+                <button class="btn secondary" id="clearBtn">🗑️ Clear Canvas</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Connor Lonergan — Hobby game developer & open source advocate</p>
+        <p>🔗 <a href="https://github.com/Zencode22" target="_blank" rel="noopener noreferrer">GitHub Profile: @Zencode22</a> &nbsp;|&nbsp;
+        📌 <a href="./index.html">Portfolio</a></p>
+        <p style="margin-top: 0.5rem;">Built with passion for games & open source · Hosted on GitHub Pages</p>
+    </footer>
+
+    <script>
+        (function () {
+            const canvas = document.getElementById('paintCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Fill canvas with white so downloads have no transparent background
+            function fillWhite() {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            fillWhite();
+
+            let drawing = false;
+            let lastPoint = null;
+            let brushColor = '#000000';
+            let brushSize = 6;
+            let tool = 'pen'; // 'pen' or 'eraser'
+
+            // --- Color swatches ---
+            const swatches = document.querySelectorAll('.swatch');
+            const customColor = document.getElementById('customColor');
+
+            function setActiveSwatch(el) {
+                swatches.forEach(s => s.classList.remove('active'));
+                if (el) el.classList.add('active');
+            }
+
+            swatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    brushColor = swatch.dataset.color;
+                    tool = 'pen';
+                    updateToolButtons();
+                    setActiveSwatch(swatch);
+                });
+            });
+
+            customColor.addEventListener('input', () => {
+                brushColor = customColor.value;
+                tool = 'pen';
+                updateToolButtons();
+                setActiveSwatch(null);
+            });
+
+            // --- Brush size ---
+            const brushSlider = document.getElementById('brushSize');
+            const brushSizeLabel = document.getElementById('brushSizeLabel');
+            brushSlider.addEventListener('input', () => {
+                brushSize = parseInt(brushSlider.value, 10);
+                brushSizeLabel.textContent = brushSize;
+            });
+
+            // --- Tools ---
+            const penToolBtn = document.getElementById('penTool');
+            const eraserToolBtn = document.getElementById('eraserTool');
+
+            function updateToolButtons() {
+                penToolBtn.classList.toggle('active', tool === 'pen');
+                eraserToolBtn.classList.toggle('active', tool === 'eraser');
+            }
+
+            penToolBtn.addEventListener('click', () => { tool = 'pen'; updateToolButtons(); });
+            eraserToolBtn.addEventListener('click', () => { tool = 'eraser'; updateToolButtons(); });
+
+            // --- Drawing helpers ---
+            function getCanvasPoint(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+
+            function drawLine(from, to) {
+                ctx.beginPath();
+                ctx.moveTo(from.x, from.y);
+                ctx.lineTo(to.x, to.y);
+                ctx.strokeStyle = (tool === 'eraser') ? '#ffffff' : brushColor;
+                ctx.lineWidth = (tool === 'eraser') ? brushSize * 2 : brushSize;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+            }
+
+            function startDraw(e) {
+                e.preventDefault();
+                drawing = true;
+                lastPoint = getCanvasPoint(e);
+                // Dot when clicking without moving
+                drawLine(lastPoint, { x: lastPoint.x + 0.01, y: lastPoint.y + 0.01 });
+            }
+
+            function moveDraw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const point = getCanvasPoint(e);
+                drawLine(lastPoint, point);
+                lastPoint = point;
+            }
+
+            function endDraw() {
+                drawing = false;
+                lastPoint = null;
+            }
+
+            // Mouse events
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', moveDraw);
+            window.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('mouseleave', endDraw);
+
+            // Touch events
+            canvas.addEventListener('touchstart', startDraw, { passive: false });
+            canvas.addEventListener('touchmove', moveDraw, { passive: false });
+            canvas.addEventListener('touchend', endDraw);
+
+            // --- Clear ---
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                if (confirm('Clear the canvas? Your current painting will be lost unless you downloaded it.')) {
+                    fillWhite();
+                }
+            });
+
+            // --- Download ---
+            document.getElementById('downloadBtn').addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.download = 'my-painting.png';
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        })();
+    </script>
+</body>
+</html>
