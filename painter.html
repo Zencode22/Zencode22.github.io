@@ -580,15 +580,29 @@
         function pointNearObject(pt,o) {
             if (o.locked) return false;
             const tol=Math.max((o.lineWidth||2)/2+4, 6);
+            // Generous bounding-box hit: makes selecting/filling/moving easy anywhere inside
+            const b=objBBox(o);
+            const inBox = pt.x>=b.x-tol && pt.x<=b.x+b.w+tol && pt.y>=b.y-tol && pt.y<=b.y+b.h+tol;
+            if (inBox) return true;
+            // For strokes/lines/no-fill shapes also allow grabbing near the drawn outline
             if (o.type==='path' || o.type==='line' || o.style==='stroke' || o.style==='nofill'){
-                // near any edge segment
                 const pts=objPoints(o);
                 for(let i=0;i<pts.length-1;i++) if(distToSeg(pt,pts[i],pts[i+1])<=tol) return true;
                 if(pts.length>2 && distToSeg(pt,pts[pts.length-1],pts[0])<=tol) return true;
-                return false;
             }
-            const b=objBBox(o);
-            return pt.x>=b.x-tol && pt.x<=b.x+b.w+tol && pt.y>=b.y-tol && pt.y<=b.y+b.h+tol;
+            return false;
+        }
+
+        function selectTopAt(pt){
+            // Clicking should always grab a topmost *selectable* object.
+            // If the visual top is already selected, fall through to objects beneath it.
+            for (let i=objects.length-1;i>=0;i--){
+                const o=objects[i];
+                if (!pointNearObject(pt,o)) continue;
+                if (selection.has(o.id)) return o;   // keep current selection for move
+                return o;                            // newly pick this object
+            }
+            return null;
         }
 
         function distToSeg(p,a,b){
@@ -878,6 +892,9 @@
         function toggleSelect(id){ if(selection.has(id)) selection.delete(id); else selection.add(id); updateSelectionButtons(); }
 
         function updateSelectionButtons(){
+            // prune stale ids (e.g. after undo restored an older object list)
+            const validIds=new Set(objects.map(o=>o.id));
+            for(const id of Array.from(selection)) if(!validIds.has(id)) selection.delete(id);
             const sel=objects.filter(o=>selection.has(o.id));
             const hasGroup=sel.some(o=>o.groupId!=null);
             document.getElementById('groupBtn').disabled = sel.length<2 || hasGroup;
@@ -950,8 +967,11 @@
         function getCanvasPoint(e){
             const rect=canvas.getBoundingClientRect();
             const scaleX=W/rect.width, scaleY=H/rect.height;
-            const clientX=e.touches?e.touches[0].clientX:e.clientX;
-            const clientY=e.touches?e.touches[0].clientY:e.clientY;
+            let clientX, clientY;
+            if (typeof e.clientX==='number') { clientX=e.clientX; clientY=e.clientY; }
+            else if (e.touches && e.touches.length) { clientX=e.touches[0].clientX; clientY=e.touches[0].clientY; }
+            else if (e.changedTouches && e.changedTouches.length) { clientX=e.changedTouches[0].clientX; clientY=e.changedTouches[0].clientY; }
+            else { return null; }
             return {x:(clientX-rect.left)*scaleX, y:(clientY-rect.top)*scaleY};
         }
 
@@ -962,6 +982,7 @@
         function onDown(e){
             e.preventDefault();
             const pt=getCanvasPoint(e);
+            if(!pt) return;
 
             // ---- Freeform custom shape ----
             if(tool==='freeform'){
@@ -987,7 +1008,7 @@
                     dragStart=pt;
                     return;
                 }
-                const hit=hitTest(pt);
+                const hit=selectTopAt(pt);
                 if(hit){
                     if(e.shiftKey){ toggleSelect(hit.id); }
                     else if(!selection.has(hit.id)){ selectOnly(hit.id); }
@@ -1045,6 +1066,7 @@
 
         function onMove(e){
             const pt=getCanvasPoint(e);
+            if(!pt) return;
 
             if(tool==='freeform' && freeformPts.length){
                 lastMouse = pt;
@@ -1180,18 +1202,53 @@
 
         // remember history snapshot when a drag begins
         let origBeforeSnap=null;
-        const _onDown=onDown;
         function onDownWrapped(e){
             origBeforeSnap=snapshot();
-            _onDown(e);
+            onDown(e);
         }
 
-        canvas.addEventListener('mousedown',onDownWrapped);
-        window.addEventListener('mousemove',onMove);
-        window.addEventListener('mouseup',onUp);
-        canvas.addEventListener('touchstart',onDownWrapped,{passive:false});
-        canvas.addEventListener('touchmove',onMove,{passive:false});
-        canvas.addEventListener('touchend',onUp);
+        // ---- Unified pointer handling (mouse + touch + pen) ----
+        // Use Pointer Events with setPointerCapture so every move/up of a gesture is
+        // delivered to the canvas — drags can no longer be "lost" mid-gesture, and
+        // selection clicks register reliably.
+        function handleDown(e){
+            if (e.pointerType==='mouse' && e.button!==0) return;   // left button only
+            e.preventDefault();
+            try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
+            origBeforeSnap=snapshot();
+            onDown(e);
+        }
+        function handleMove(e){
+            // ignore idle hover moves for speed; freeform needs them for rubber-banding
+            if (dragMode===null && !drawing && !(tool==='freeform' && freeformPts.length)) return;
+            if (e.cancelable) e.preventDefault();
+            onMove(e);
+        }
+        function handleUp(e){
+            try{ canvas.releasePointerCapture(e.pointerId); }catch(_){}
+            onUp(e);
+        }
+        function handleCancel(e){
+            drawing=false; dragMode=null; marquee=null; previewObj=null;
+            render();
+        }
+
+        if ('onpointerdown' in window) {
+            canvas.addEventListener('pointerdown', handleDown);
+            canvas.addEventListener('pointermove', handleMove);
+            canvas.addEventListener('pointerup', handleUp);
+            canvas.addEventListener('pointercancel', handleCancel);
+            // prevent double-tap zoom / scroll interference on touch devices
+            canvas.style.touchAction='none';
+        } else {
+            // legacy fallback
+            canvas.addEventListener('mousedown',handleDown);
+            window.addEventListener('mousemove',onMove);
+            window.addEventListener('mouseup',handleUp);
+            canvas.addEventListener('touchstart',handleDown,{passive:false});
+            canvas.addEventListener('touchmove',handleMove,{passive:false});
+            canvas.addEventListener('touchend',handleUp);
+        }
 
         // ===================== FREEFORM FINISH =====================
         function finishFreeform(){
