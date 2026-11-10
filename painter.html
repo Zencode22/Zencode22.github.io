@@ -379,13 +379,13 @@
                         <option value="fillstroke">Fill + Stroke</option>
                         <option value="nofill">No Fill (outline only)</option>
                     </select>
-                    <label class="tool-label" style="display:flex;align-items:center;gap:0.3rem;cursor:pointer;">
-                        <input type="checkbox" id="secondColorToggle" checked> 2nd color
-                    </label>
-                    <input type="color" id="secondaryColor" value="#c41e3a" title="Secondary color (stroke / fill+stroke)">
+                </div>
+                <div class="tool-group">
+                    <span class="tool-label">Stroke Color:</span>
+                    <input type="color" id="secondaryColor" value="#c41e3a" title="Stroke color picker">
                 </div>
                 <div class="tool-group" id="swatches">
-                    <span class="tool-label">Colors:</span>
+                    <span class="tool-label">Fill Color:</span>
                     <button class="swatch active" data-color="#000000" style="background:#000000" title="Black"></button>
                     <button class="swatch" data-color="#c41e3a" style="background:#c41e3a" title="Palestine Red"></button>
                     <button class="swatch" data-color="#007a3d" style="background:#007a3d" title="Palestine Green"></button>
@@ -441,9 +441,8 @@
         let nextId = 1;
 
         let tool = 'pen';          // pen | eraser | rect | ellipse | line | star | polygon:<name> | freeform
-        let brushColor = '#000000';
-        let secondaryColor = '#c41e3a';
-        let secondColorOn = true;
+        let brushColor = '#000000';       // Fill color (swatches + main picker; pen strokes use this too)
+        let secondaryColor = '#c41e3a';   // Stroke color (shape outlines / stroke style)
         let brushSize = 6;
         let shapeStyle = 'fill';   // fill | stroke | fillstroke | nofill
 
@@ -545,11 +544,12 @@
             ctx.lineWidth=o.lineWidth||2;
             ctx.lineCap='round';
             ctx.lineJoin='round';
-            if(style==='fill'){ ctx.fillStyle=o.color; ctx.fill(); }
+            // Primary color = Stroke, Secondary color = Fill
+            if(style==='fill'){ ctx.fillStyle=o.secondary||o.color; ctx.fill(); }
             else if(style==='stroke'||style==='nofill'){ ctx.strokeStyle=o.color; ctx.stroke(); }
             else if(style==='fillstroke'){
-                ctx.fillStyle=o.color; ctx.fill();
-                ctx.strokeStyle=o.secondary||'#000'; ctx.stroke();
+                ctx.fillStyle=o.secondary||'#000'; ctx.fill();
+                ctx.strokeStyle=o.color; ctx.stroke();
             }
         }
 
@@ -699,7 +699,6 @@
         const swatches=document.querySelectorAll('.swatch');
         const customColor=document.getElementById('customColor');
         const secondaryInput=document.getElementById('secondaryColor');
-        const secondToggle=document.getElementById('secondColorToggle');
 
         function setActiveSwatch(el){
             swatches.forEach(s=>s.classList.remove('active'));
