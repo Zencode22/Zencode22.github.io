@@ -435,6 +435,17 @@
         const W = canvas.width, H = canvas.height;
 
         // ===================== STATE =====================
+        // Status bar elements are declared here (before render()/setHint() can
+        // touch them) so that helper functions called during init never hit a
+        // "cannot access before initialization" temporal-dead-zone error.
+        const statusObjects = document.getElementById('statusObjects');
+        const statusHint = document.getElementById('statusHint');
+        const defaultHint = statusHint.textContent;
+        function setHint(t){ statusHint.textContent=t; clearTimeout(setHint._t); setHint._t=setTimeout(()=>{statusHint.textContent=defaultHint;},6000); }
+        function updateStatus(){
+            statusObjects.textContent='Objects: '+objects.length;
+        }
+
         let objects = [];          // list of drawable objects
         let undoStack = [];        // snapshots (JSON strings) BEFORE each action
         let redoStack = [];        // snapshots AFTER undone actions
@@ -454,6 +465,7 @@
         // freeform custom-shape state
         let freeformPts = [];
         let lastMouse = null;
+        let freeformLastClick = 0;   // timestamp of last click (double-click detection)
 
 
         // ===================== OBJECT FACTORIES =====================
@@ -473,7 +485,7 @@
             }, props);
         }
 
-        // Regular polygons: 5 custom shapes
+        // Regular polygons: 5 custom shapes (name -> number of sides)
         const POLYGONS = {
             triangle: 3,
             pentagon: 5,
@@ -507,7 +519,7 @@
                 return pts;
             }
             if (o.type === 'polygon') {
-                const n = POLYGONS[o.sides] || 5;
+                const n = (typeof o.sides === 'number') ? o.sides : (POLYGONS[o.sides] || 5);
                 for (let i=0;i<n;i++){
                     const a=-Math.PI/2 + i*2*Math.PI/n;
                     pts.push({x:cx+rx*Math.cos(a), y:cy+ry*Math.sin(a)});
@@ -544,12 +556,12 @@
             ctx.lineWidth=o.lineWidth||2;
             ctx.lineCap='round';
             ctx.lineJoin='round';
-            // Primary color = Stroke, Secondary color = Fill
-            if(style==='fill'){ ctx.fillStyle=o.secondary||o.color; ctx.fill(); }
-            else if(style==='stroke'||style==='nofill'){ ctx.strokeStyle=o.color; ctx.stroke(); }
+            // Primary color (Fill Color picker) = fill, Secondary color (Stroke Color picker) = outline
+            if(style==='fill'){ ctx.fillStyle=o.color; ctx.fill(); }
+            else if(style==='stroke'||style==='nofill'){ ctx.strokeStyle=o.secondary||o.color; ctx.stroke(); }
             else if(style==='fillstroke'){
-                ctx.fillStyle=o.secondary||'#000'; ctx.fill();
-                ctx.strokeStyle=o.color; ctx.stroke();
+                ctx.fillStyle=o.color; ctx.fill();
+                ctx.strokeStyle=o.secondary||'#000'; ctx.stroke();
             }
         }
 
@@ -675,6 +687,8 @@
         function setTool(t){
             if(tool==='freeform' && t!=='freeform'){ freeformPts=[]; lastMouse=null; }
             tool=t;
+            // 'active' highlight only for the dedicated tool buttons (pen/eraser/shapes);
+            // the shared .tool-btn class is also used by undo/redo, which must not be highlighted.
             toolBtns.forEach(b=>b.classList.toggle('active', b.dataset.tool===t));
             freeformBtn.classList.toggle('active', t==='freeform');
             if(t.startsWith('polygon:')) polygonSelect.value=t.slice(8);
@@ -715,7 +729,6 @@
         secondaryInput.addEventListener('input',()=>{
             secondaryColor=secondaryInput.value;
         });
-        secondToggle.addEventListener('change',()=>{ secondColorOn=secondToggle.checked; });
 
         const brushSlider=document.getElementById('brushSize');
         const brushSizeLabel=document.getElementById('brushSizeLabel');
@@ -727,7 +740,6 @@
         const styleSelect=document.getElementById('shapeStyle');
         styleSelect.addEventListener('change',()=>{
             shapeStyle=styleSelect.value;
-            if(shapeStyle==='fillstroke' && !secondColorOn){ secondToggle.checked=true; secondColorOn=true; }
         });
 
 
@@ -755,10 +767,18 @@
             // ---- Freeform custom shape ----
             if(tool==='freeform'){
                 const now=Date.now();
-                if(e.detail===2 || (freeformLastClick && now-freeformLastClick<350)){
+                // Double-click finishes the shape, but only when at least one
+                // point was already placed — otherwise the very first click of a
+                // double-click would consume the (empty) session and the second
+                // click would silently start a brand-new shape.
+                const dbl=(e.detail===2 || (freeformLastClick && now-freeformLastClick<350));
+                if(dbl && freeformPts.length){
                     finishFreeform();
                     return;
                 }
+                // A fresh starting click (after finishing/cancelling) must not be
+                // treated as part of a previous double-click gesture.
+                if(!freeformPts.length) freeformLastClick=0;
                 freeformLastClick=now;
                 freeformPts.push(pt);
                 render();
@@ -788,20 +808,19 @@
                 drawing=true;
                 shapeStart=pt;
                 const type=tool.startsWith('polygon:')?'polygon':tool;
-                const sides=type==='polygon'?tool.slice(8):undefined;
+                // store the numeric side count so rendering never depends on name lookups
+                const sides=type==='polygon'?(POLYGONS[tool.slice(8)]||5):undefined;
                 previewObj=makePathObject(type,{
                     x:pt.x,y:pt.y,w:0,h:0,sides:sides,
                     x2:pt.x,y2:pt.y,
                     color:brushColor,
-                    secondary:secondColorOn?secondaryColor:brushColor,
+                    secondary:secondaryColor,
                     style:shapeStyle,
                     lineWidth:brushSize
                 });
                 render();
             }
         }
-
-        let freeformLastClick=0;
 
         function onMove(e){
             const pt=getCanvasPoint(e);
@@ -913,7 +932,7 @@
                     commitAction(()=>objects.push(makePathObject('freeform',{
                         x:minX,y:minY,w:w,h:h,localPts:localPts,
                         color:brushColor,
-                        secondary:secondColorOn?secondaryColor:brushColor,
+                        secondary:secondaryColor,
                         style:shapeStyle,lineWidth:brushSize
                     })));
                     setHint('Custom shape added! Keep clicking to draw another, or switch tools.');
@@ -935,15 +954,6 @@
             }
             if(k==='enter' && tool==='freeform'){ finishFreeform(); return; }
         });
-
-        // ===================== STATUS / HINT =====================
-        const statusObjects=document.getElementById('statusObjects');
-        const statusHint=document.getElementById('statusHint');
-        const defaultHint=statusHint.textContent;
-        function setHint(t){ statusHint.textContent=t; clearTimeout(setHint._t); setHint._t=setTimeout(()=>{statusHint.textContent=defaultHint;},6000); }
-        function updateStatus(){
-            statusObjects.textContent='Objects: '+objects.length;
-        }
 
         // ===================== CLEAR / DOWNLOAD =====================
         // Clear Canvas starts a brand-new session: wipes the board AND resets
