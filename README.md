@@ -20,6 +20,7 @@ Here is the updated README.md that accounts for your index.html portfolio site. 
 | **Crafting Creature World** | Open-world crafting and creature simulation | [Download](https://github.com/Zencode22/CraftingCreatureWorld/releases/tag/final) |
 | **Monster Maze** | Procedurally generated mazes with monsters | [Download](https://github.com/Zencode22/MonsterMaze/releases/tag/Final) |
 | **FediAgri** | Federated agriculture platform for sustainable farming | [Download](https://github.com/Zencode22/FediAgi/releases/tag/FinalBuild) |
+| **Painter Studio** | Browser-based web paint program (Canvas 2D, no dependencies) | [Live Demo](https://zencode22.github.io/painter.html) · [Docs](./PAINTER_README.md) |
 
 ---
 
